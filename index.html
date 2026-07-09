@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The LockBoxx Vault</title>
+<meta name="description" content="Tools, games, and tabletop magic hosted on lockboxx.org.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🗝️</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Alegreya:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #04090b;
+    --panel: rgba(10, 26, 28, 0.6);
+    --text: #d9f2ea;
+    --text-dim: #7db3a7;
+    --aqua: #55e6c4;
+    --mint: #8ff5d2;
+    --teal: #2ec4a5;
+    --ice: #b8f0e4;
+    --deep: #1d8f83;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--ink);
+    color: var(--text);
+    font-family: "Alegreya", Georgia, serif;
+    font-size: 17px;
+    line-height: 1.5;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── Psychedelic fluid background ───────── */
+  .fluid {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .blob {
+    position: absolute;
+    width: 70vmax;
+    height: 70vmax;
+    border-radius: 50%;
+    filter: blur(70px);
+    mix-blend-mode: screen;
+    opacity: 0.55;
+  }
+
+  .blob-1 {
+    top: -30vmax; left: -20vmax;
+    background: radial-gradient(circle at 40% 40%, rgba(85, 230, 196, 0.5), rgba(29, 143, 131, 0.25) 45%, transparent 70%);
+    animation: drift1 47s ease-in-out infinite alternate;
+  }
+  .blob-2 {
+    bottom: -35vmax; right: -25vmax;
+    background: radial-gradient(circle at 60% 60%, rgba(46, 196, 165, 0.4), rgba(20, 90, 95, 0.25) 50%, transparent 72%);
+    animation: drift2 61s ease-in-out infinite alternate;
+  }
+  .blob-3 {
+    top: 20%; left: 30%;
+    width: 50vmax; height: 50vmax;
+    background: radial-gradient(circle at 50% 50%, rgba(143, 245, 210, 0.28), rgba(30, 120, 115, 0.15) 50%, transparent 70%);
+    animation: drift3 53s ease-in-out infinite alternate;
+  }
+
+  @keyframes drift1 {
+    from { transform: translate(0, 0) rotate(0deg) scale(1); }
+    to   { transform: translate(18vmax, 14vmax) rotate(60deg) scale(1.25); }
+  }
+  @keyframes drift2 {
+    from { transform: translate(0, 0) scale(1); }
+    to   { transform: translate(-16vmax, -12vmax) scale(1.3); }
+  }
+  @keyframes drift3 {
+    from { transform: translate(0, 0) scale(0.9); }
+    to   { transform: translate(-14vmax, 10vmax) scale(1.2); }
+  }
+
+  /* swirled marbling lines over the blobs */
+  .swirl {
+    position: absolute;
+    inset: -25%;
+    background:
+      repeating-conic-gradient(from 0deg at 30% 25%,
+        transparent 0deg 9deg,
+        rgba(85, 230, 196, 0.05) 10deg 11deg,
+        transparent 12deg 22deg),
+      repeating-conic-gradient(from 90deg at 70% 75%,
+        transparent 0deg 11deg,
+        rgba(143, 245, 210, 0.04) 12deg 13deg,
+        transparent 14deg 26deg);
+    animation: spin 240s linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  #motes {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .page {
+    position: relative;
+    z-index: 2;
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 4.5rem 1.5rem 3rem;
+  }
+
+  /* ── Header ─────────────────────────────── */
+  header { text-align: center; margin-bottom: 3.5rem; }
+
+  h1 {
+    font-family: "Cinzel Decorative", serif;
+    font-weight: 900;
+    font-size: clamp(2.2rem, 6.5vw, 4rem);
+    line-height: 1.1;
+    background: linear-gradient(180deg, var(--ice) 15%, var(--aqua) 50%, var(--deep) 95%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 24px rgba(85, 230, 196, 0.3));
+  }
+
+  .divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.9rem;
+    margin: 1.6rem auto 0;
+    color: var(--aqua);
+  }
+  .divider::before,
+  .divider::after {
+    content: "";
+    height: 1px;
+    width: min(160px, 22vw);
+    background: linear-gradient(90deg, transparent, rgba(85, 230, 196, 0.4));
+  }
+  .divider::after {
+    background: linear-gradient(90deg, rgba(85, 230, 196, 0.4), transparent);
+  }
+  .divider .star { font-size: 0.9rem; text-shadow: 0 0 10px rgba(85, 230, 196, 0.5); }
+
+  /* ── Sections ───────────────────────────── */
+  section { margin-bottom: 3rem; }
+
+  .section-head {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    margin-bottom: 1.4rem;
+  }
+
+  h2 {
+    font-family: "Cinzel Decorative", serif;
+    font-weight: 700;
+    font-size: clamp(1.2rem, 3vw, 1.5rem);
+    color: var(--aqua);
+    text-shadow: 0 0 18px rgba(85, 230, 196, 0.25);
+    white-space: nowrap;
+  }
+
+  .section-head::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(85, 230, 196, 0.35), transparent);
+    transform: translateY(-0.35em);
+  }
+
+  /* ── Cards ──────────────────────────────── */
+  .chest {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+  }
+
+  .card {
+    --gem: var(--aqua);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+    padding: 1.15rem 1.25rem 1.1rem;
+    background:
+      radial-gradient(120% 90% at 50% 0%, rgba(143, 245, 210, 0.05), transparent 60%),
+      var(--panel);
+    border: 1px solid rgba(85, 230, 196, 0.2);
+    border-radius: 10px;
+    text-decoration: none;
+    color: inherit;
+    overflow: hidden;
+    backdrop-filter: blur(4px);
+    transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+  }
+
+  /* shimmer sweep */
+  .card::after {
+    content: "";
+    position: absolute;
+    top: 0; bottom: 0;
+    left: -75%;
+    width: 50%;
+    background: linear-gradient(105deg, transparent, rgba(216, 255, 244, 0.1), transparent);
+    transform: skewX(-20deg);
+    pointer-events: none;
+  }
+
+  .card:hover, .card:focus-visible {
+    transform: translateY(-3px);
+    border-color: var(--gem);
+    box-shadow:
+      0 10px 30px rgba(0, 0, 0, 0.5),
+      0 0 26px color-mix(in srgb, var(--gem) 32%, transparent),
+      inset 0 0 30px color-mix(in srgb, var(--gem) 8%, transparent);
+  }
+
+  .card:hover::after, .card:focus-visible::after {
+    animation: shimmer 0.9s ease forwards;
+  }
+
+  @keyframes shimmer {
+    to { left: 125%; }
+  }
+
+  .card:focus-visible {
+    outline: 2px solid var(--gem);
+    outline-offset: 3px;
+  }
+
+  .card-top {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+  }
+
+  .sigil {
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    width: 2.6rem;
+    height: 2.6rem;
+    font-size: 1.3rem;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--gem) 28%, transparent), rgba(0, 0, 0, 0.4));
+    border: 1px solid color-mix(in srgb, var(--gem) 50%, transparent);
+    box-shadow: 0 0 14px color-mix(in srgb, var(--gem) 22%, transparent);
+  }
+
+  .card-title {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    min-width: 0;
+  }
+
+  .card-name {
+    font-weight: 700;
+    font-size: 1.12rem;
+    color: #eafff7;
+    line-height: 1.25;
+  }
+
+  .card-domain {
+    font-size: 0.76rem;
+    letter-spacing: 0.07em;
+    color: color-mix(in srgb, var(--gem) 70%, var(--text-dim));
+    opacity: 0.9;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .card-desc {
+    font-size: 0.94rem;
+    color: var(--text-dim);
+    line-height: 1.45;
+  }
+
+  /* tints */
+  .gem-mint { --gem: var(--mint); }
+  .gem-aqua { --gem: var(--aqua); }
+  .gem-teal { --gem: var(--teal); }
+  .gem-ice  { --gem: var(--ice); }
+  .gem-deep { --gem: #3fd4c4; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .card, .card::after { transition: none; animation: none !important; }
+    .card:hover { transform: none; }
+    .blob, .swirl { animation: none !important; }
+  }
+
+  @media (max-width: 900px) {
+    .chest { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  @media (max-width: 620px) {
+    .page { padding-top: 3rem; }
+    .chest { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="fluid" aria-hidden="true">
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
+  <div class="swirl"></div>
+</div>
+<canvas id="motes" aria-hidden="true"></canvas>
+
+<div class="page">
+  <header>
+    <h1>The LockBoxx Vault</h1>
+    <div class="divider" aria-hidden="true"><span class="star">✦</span><span class="star">✧</span><span class="star">✦</span></div>
+  </header>
+
+  <section aria-labelledby="tools">
+    <div class="section-head"><h2 id="tools">Tools</h2></div>
+    <div class="chest">
+
+      <a class="card gem-teal" href="https://cyberchef.lockboxx.org">
+        <span class="card-top">
+          <span class="sigil" aria-hidden="true">⚗️</span>
+          <span class="card-title"><span class="card-name">CyberChef</span><span class="card-domain">cyberchef.lockboxx.org</span></span>
+        </span>
+        <span class="card-desc">The Cyber Swiss Army Knife — encryption, encoding, compression, and data analysis.</span>
+      </a>
+
+      <a class="card gem-aqua" href="https://calc.lockboxx.org">
+        <span class="card-top">
+          <span class="sigil" aria-hidden="true">🧮</span>
+          <span class="card-title"><span class="card-name">Scientific Calculator</span><span class="card-domain">calc.lockboxx.org</span></span>
+        </span>
+        <span class="card-desc">A full scientific calculator in the browser.</span>
+      </a>
+
+      <a class="card gem-mint" href="https://bayes.lockboxx.org">
+        <span class="card-top">
+          <span class="sigil" aria-hidden="true">🔮</span>
+          <span class="card-title"><span class="card-name">Casual Bayes</span><span class="card-domain">bayes.lockboxx.org</span></span>
+        </span>
+        <span class="card-desc">A Bayes' theorem calculator — three plain-English numbers in, one honest probability out.</span>
+      </a>
+
+      <a class="card gem-ice" href="https://stars.lockboxx.org">
+        <span class="card-top">
+          <span class="sigil" aria-hidden="true">🌟</span>
+          <span class="card-title"><span class="card-name">Star Seeker</span><span class="card-domain">stars.lockboxx.org</span></span>
+        </span>
+        <span class="card-desc">See which constellations are visible tonight for any date and location, and where to look.</span>
+      </a>
+
+      <a class="card gem-deep" href="https://art.lockboxx.org">
+        <span class="card-top">
+          <span class="sigil" aria-hidden="true">🎨</span>
+          <span class="card-title"><span class="card-name">Spritebench</span><span class="card-domain">art.lockboxx.org</span></span>
+        </span>
+        <span class="card-desc">A pixel-art sprite editor in the browser.</span>
+      </a>
+
+      <a class="card gem-aqua" href="https://video.lockboxx.org">
+        <span class="card-top">
+          <span class="sigil" aria-hidden="true">🎬</span>
+          <span class="card-title"><span class="card-name">Timeline Composer</span><span class="card-domain">video.lockboxx.org</span></span>
+        </span>
+        <span class="card-desc">Combine photos, video clips, and music into one video — nothing is uploaded.</span>
+      </a>
+
+      <a class="card gem-teal" href="https://seclist.lockboxx.org">
+        <span class="card-top">
+          <span class="sigil" aria-hidden="true">📜</span>
+          <span class="card-title"><span class="card-name">secdigest</span><span class="card-domain">seclist.lockboxx.org</span></span>
+        </span>
+        <span class="card-desc">A curated security news digest — signal from the wire.</span>
+      </a>
+
+      <a class="card gem-mint" href="https://blog.lockboxx.org">
+        <span class="card-top">
+          <span class="sigil" aria-hidden="true">✒️</span>
+          <span class="card-title"><span class="card-name">Blog</span><span class="card-domain">blog.lockboxx.org</span></span>
+        </span>
+        <span class="card-desc">Writing on security and craft from LockBoxx.</span>
+      </a>
+
+      <a class="card gem-ice" href="https://fraudwatch.lockboxx.org">
+        <span class="card-top">
+          <span class="sigil" aria-hidden="true">🕵️</span>
+          <span class="card-title"><span class="card-name">FraudWatch</span><span class="card-domain">fraudwatch.lockboxx.org</span></span>
+        </span>
+        <span class="card-desc">A local-first fraud-defense extension — catches fake logins, wallet-seed grabs, and scareware popups, entirely on your device.</span>
+      </a>
+
+    </div>
+  </section>
+
+  <section aria-labelledby="games">
+    <div class="section-head"><h2 id="games">Games</h2></div>
+    <div class="chest">
+
+      <a class="card gem-mint" href="https://archmage.lockboxx.org">
+        <span class="card-top">
+          <span class="sigil" aria-hidden="true">🧙</span>
+          <span class="card-title"><span class="card-name">Archmage</span><span class="card-domain">archmage.lockboxx.org</span></span>
+        </span>
+        <span class="card-desc">A game of spellcraft and sorcery.</span>
+      </a>
+
+      <a class="card gem-ice" href="https://dreamride.lockboxx.org">
+        <span class="card-top">
+          <span class="sigil" aria-hidden="true">🐕</span>
+          <span class="card-title"><span class="card-name">Dream Ride: Dog Days</span><span class="card-domain">dreamride.lockboxx.org</span></span>
+        </span>
+        <span class="card-desc">A laid-back driving game with a dog along for the ride.</span>
+      </a>
+
+      <a class="card gem-aqua" href="https://asteroid.lockboxx.org">
+        <span class="card-top">
+          <span class="sigil" aria-hidden="true">☄️</span>
+          <span class="card-title"><span class="card-name">Starbreaker</span><span class="card-domain">asteroid.lockboxx.org</span></span>
+        </span>
+        <span class="card-desc">An Asteroids-style roguelite — blast rocks, upgrade, repeat.</span>
+      </a>
+
+      <a class="card gem-teal" href="https://yampa.lockboxx.org">
+        <span class="card-top">
+          <span class="sigil" aria-hidden="true">🏔️</span>
+          <span class="card-title"><span class="card-name">Yampa Valley</span><span class="card-domain">yampa.lockboxx.org</span></span>
+        </span>
+        <span class="card-desc">An adventure set in the Yampa Valley.</span>
+      </a>
+
+      <a class="card gem-deep" href="https://doom.lockboxx.org">
+        <span class="card-top">
+          <span class="sigil" aria-hidden="true">👹</span>
+          <span class="card-title"><span class="card-name">WebDOOM</span><span class="card-domain">doom.lockboxx.org</span></span>
+        </span>
+        <span class="card-desc">Classic DOOM, playable right in the browser.</span>
+      </a>
+
+      <a class="card gem-mint" href="https://race.lockboxx.org">
+        <span class="card-top">
+          <span class="sigil" aria-hidden="true">🌀</span>
+          <span class="card-title"><span class="card-name">Fractal Rider</span><span class="card-domain">race.lockboxx.org</span></span>
+        </span>
+        <span class="card-desc">A high-speed racer through fractal landscapes.</span>
+      </a>
+
+      <a class="card gem-aqua" href="https://pinball.lockboxx.org">
+        <span class="card-top">
+          <span class="sigil" aria-hidden="true">⚡</span>
+          <span class="card-title"><span class="card-name">Pinball</span><span class="card-domain">pinball.lockboxx.org</span></span>
+        </span>
+        <span class="card-desc">LockBoxx pinball — keep the ball alive and chase the high score.</span>
+      </a>
+
+    </div>
+  </section>
+
+  <section aria-labelledby="rpg">
+    <div class="section-head"><h2 id="rpg">RPG Tools</h2></div>
+    <div class="chest">
+
+      <a class="card gem-aqua" href="https://secretagent.lockboxx.org">
+        <span class="card-top">
+          <span class="sigil" aria-hidden="true">🕶️</span>
+          <span class="card-title"><span class="card-name">Secret Agent: Field Operations</span><span class="card-domain">secretagent.lockboxx.org</span></span>
+        </span>
+        <span class="card-desc">Tabletop tools for running spy-thriller operations.</span>
+      </a>
+
+      <a class="card gem-teal" href="https://daggerheart.lockboxx.org">
+        <span class="card-top">
+          <span class="sigil" aria-hidden="true">🗡️</span>
+          <span class="card-title"><span class="card-name">Heartforge</span><span class="card-domain">daggerheart.lockboxx.org</span></span>
+        </span>
+        <span class="card-desc">A free character builder compatible with Daggerheart™ — characters stored locally in your browser.</span>
+      </a>
+
+      <a class="card gem-mint" href="https://morkborg-items.lockboxx.org">
+        <span class="card-top">
+          <span class="sigil" aria-hidden="true">💀</span>
+          <span class="card-title"><span class="card-name">MÖRK BORG Item Generator</span><span class="card-domain">morkborg-items.lockboxx.org</span></span>
+        </span>
+        <span class="card-desc">Random weapons, relics, and grim curiosities for MÖRK BORG.</span>
+      </a>
+
+    </div>
+  </section>
+</div>
+
+<script>
+  (function () {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    const canvas = document.getElementById("motes");
+    const ctx = canvas.getContext("2d");
+    let w, h, motes;
+
+    function resize() {
+      w = canvas.width = window.innerWidth;
+      h = canvas.height = window.innerHeight;
+    }
+
+    function spawn() {
+      const count = Math.min(60, Math.floor((w * h) / 28000));
+      motes = Array.from({ length: count }, () => ({
+        x: Math.random() * w,
+        y: Math.random() * h,
+        r: 0.6 + Math.random() * 1.6,
+        vx: (Math.random() - 0.5) * 0.15,
+        vy: -0.05 - Math.random() * 0.22,
+        phase: Math.random() * Math.PI * 2,
+        speed: 0.008 + Math.random() * 0.02,
+        hue: 155 + Math.random() * 35 // seafoam to aqua
+      }));
+    }
+
+    function tick() {
+      ctx.clearRect(0, 0, w, h);
+      for (const m of motes) {
+        m.x += m.vx;
+        m.y += m.vy;
+        m.phase += m.speed;
+        if (m.y < -5) { m.y = h + 5; m.x = Math.random() * w; }
+        if (m.x < -5) m.x = w + 5;
+        if (m.x > w + 5) m.x = -5;
+        const twinkle = 0.25 + 0.55 * (0.5 + 0.5 * Math.sin(m.phase));
+        ctx.beginPath();
+        ctx.arc(m.x, m.y, m.r, 0, Math.PI * 2);
+        ctx.fillStyle = `hsla(${m.hue}, 85%, 72%, ${twinkle * 0.5})`;
+        ctx.shadowColor = `hsla(${m.hue}, 95%, 68%, ${twinkle})`;
+        ctx.shadowBlur = 6;
+        ctx.fill();
+      }
+      ctx.shadowBlur = 0;
+      requestAnimationFrame(tick);
+    }
+
+    resize();
+    spawn();
+    window.addEventListener("resize", () => { resize(); spawn(); });
+    tick();
+  })();
+</script>
+</body>
+</html>
