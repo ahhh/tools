@@ -20,6 +20,7 @@
     --teal: #2ec4a5;
     --ice: #b8f0e4;
     --deep: #1d8f83;
+    --gold: #e6c169;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -297,10 +298,33 @@
   .gem-teal { --gem: var(--teal); }
   .gem-ice  { --gem: var(--ice); }
   .gem-deep { --gem: #3fd4c4; }
+  .gem-gold { --gem: var(--gold); }
+
+  /* subtly glowing golden border */
+  .card-gold {
+    border-color: rgba(230, 193, 105, 0.38);
+    animation: goldPulse 6s ease-in-out infinite;
+  }
+  .card-gold:hover, .card-gold:focus-visible { animation: none; }
+
+  @keyframes goldPulse {
+    0%, 100% {
+      border-color: rgba(230, 193, 105, 0.3);
+      box-shadow: 0 0 10px rgba(230, 193, 105, 0.1), inset 0 0 16px rgba(230, 193, 105, 0.04);
+    }
+    50% {
+      border-color: rgba(230, 193, 105, 0.6);
+      box-shadow: 0 0 22px rgba(230, 193, 105, 0.24), inset 0 0 22px rgba(230, 193, 105, 0.08);
+    }
+  }
 
   @media (prefers-reduced-motion: reduce) {
     .card, .card::after { transition: none; animation: none !important; }
     .card:hover { transform: none; }
+    .card-gold {
+      border-color: rgba(230, 193, 105, 0.45);
+      box-shadow: 0 0 16px rgba(230, 193, 105, 0.16), inset 0 0 18px rgba(230, 193, 105, 0.06);
+    }
     .blob, .swirl { animation: none !important; }
   }
 
@@ -442,6 +466,14 @@
           <span class="card-title"><span class="card-name">Yampa Valley</span><span class="card-domain">yampa.lockboxx.org</span></span>
         </span>
         <span class="card-desc">An adventure set in the Yampa Valley.</span>
+      </a>
+
+      <a class="card gem-gold card-gold" href="https://mmo.lockboxx.org/">
+        <span class="card-top">
+          <span class="sigil" aria-hidden="true">🃏</span>
+          <span class="card-title"><span class="card-name">DEF CON MMO</span><span class="card-domain">mmo.lockboxx.org</span></span>
+        </span>
+        <span class="card-desc">An MMO deck builder game.</span>
       </a>
 
       <a class="card gem-deep" href="https://doom.lockboxx.org">
